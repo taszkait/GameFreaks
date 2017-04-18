@@ -11,8 +11,8 @@ import it.taszka.freaks.Screens.PlayScreen;
 
 
 public class Freaks extends Game {
-	public static final int v_width = 800;
-	public static final int v_height =380;
+	public static final int v_width = 400;
+	public static final int v_height =200;
 
 	public SpriteBatch batch;
 

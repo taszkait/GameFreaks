@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
 import it.taszka.freaks.Freaks;
 

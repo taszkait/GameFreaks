@@ -1,10 +1,10 @@
 package it.taszka.freaks.Screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -14,21 +14,22 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
 import it.taszka.freaks.Freaks;
 import it.taszka.freaks.Scenes.Hud;
+import it.taszka.freaks.Sprites.Freak;
+
 
 public class PlayScreen implements Screen {
 
     private Freaks game;
+    private Freak player;
     private OrthographicCamera gameCame;
     private Viewport gamePort;
     private Hud hud;
@@ -47,22 +48,26 @@ public class PlayScreen implements Screen {
         this.game = game;
         //create camera used to follow freak through camera world
         gameCame = new OrthographicCamera();
-        //create a FitViewport to maintain virtual aspect despite screen size
 
-        gamePort = new FitViewport(Freaks.v_width, Freaks.v_height, gameCame);
+        //create a FitViewport to maintain virtual aspect despite screen size
+        gamePort = new FitViewport(Freaks.v_width / Freaks.PPM, Freaks.v_height / Freaks.PPM, gameCame);
+
         //create HUD for scores/timers/level info
         hud = new Hud(game.batch);
 
         //load our map and stepu our map renderer
         maploader = new TmxMapLoader();
         map = maploader.load("level1.tmx");
-        renderer = new OrthogonalTiledMapRenderer(map);
+        renderer = new OrthogonalTiledMapRenderer(map,1 / Freaks.PPM);
 
-        //initially set our gameCame to be correctly at the start
+        //initially set our gameCame to be correctly at the start of map
         gameCame.position.set(gamePort.getScreenWidth() / 2, gamePort.getScreenHeight() / 2, 0);
 
         //Vector2 for gravity
-        world = new World(new Vector2(0, 0), true);
+        world = new World(new Vector2(0, -10), true);
+
+        //initialization of Freak class object
+        player = new Freak(world);
         b2dr = new Box2DDebugRenderer();
 
         BodyDef bdef = new BodyDef();
@@ -70,16 +75,17 @@ public class PlayScreen implements Screen {
         FixtureDef fdef = new FixtureDef();
         Body body;
 
+
         //create ground bodies/fixtures
         for (MapObject object : map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.getHeight() / 2);
+            bdef.position.set((rect.getX() + rect.getWidth() / 2) / Freaks.PPM, (rect.getY() + rect.getHeight() / 2) / Freaks.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
+            shape.setAsBox(rect.getWidth() / 2 / Freaks.PPM, rect.getHeight() / 2 / Freaks.PPM);
             fdef.shape = shape;
             body.createFixture(fdef);
         }
@@ -89,11 +95,11 @@ public class PlayScreen implements Screen {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.getHeight() / 2);
+            bdef.position.set((rect.getX() + rect.getWidth() / 2) / Freaks.PPM, (rect.getY() + rect.getHeight() / 2) / Freaks.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
+            shape.setAsBox(rect.getWidth() / 2 / Freaks.PPM, rect.getHeight() / 2 / Freaks.PPM);
             fdef.shape = shape;
             body.createFixture(fdef);
         }
@@ -103,11 +109,11 @@ public class PlayScreen implements Screen {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.getHeight() / 2);
+            bdef.position.set((rect.getX() + rect.getWidth() / 2) / Freaks.PPM, (rect.getY() + rect.getHeight() / 2) / Freaks.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
+            shape.setAsBox(rect.getWidth() / 2 / Freaks.PPM, rect.getHeight() / 2 / Freaks.PPM);
             fdef.shape = shape;
             body.createFixture(fdef);
         }
@@ -117,11 +123,11 @@ public class PlayScreen implements Screen {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.getHeight() / 2);
+            bdef.position.set((rect.getX() + rect.getWidth() / 2) / Freaks.PPM, (rect.getY() + rect.getHeight() / 2) / Freaks.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
+            shape.setAsBox(rect.getWidth() / 2 / Freaks.PPM, rect.getHeight() / 2 / Freaks.PPM);
             fdef.shape = shape;
             body.createFixture(fdef);
         }
@@ -133,18 +139,34 @@ public class PlayScreen implements Screen {
     }
 
     public void handleInput(float dt){
-        if(Gdx.input.isTouched())
-            gameCame.position.x += 100*dt;
+        //if our user is holding down mose move our camera through the game world
+        /*if(Gdx.input.isTouched())
+            gameCame.position.x += 100*dt; */
+        if(Gdx.input.isKeyJustPressed(Input.Keys.UP))
+            player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(),true);
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= 2)
+            player.b2body.applyLinearImpulse(new Vector2(0.1f, 0), player.b2body.getWorldCenter(), true);
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -2)
+            player.b2body.applyLinearImpulse(new Vector2(-0.1f, 0), player.b2body.getWorldCenter(), true);
     }
 
     public void update (float dt){
+        //handle user input first
         handleInput(dt);
+
+        world.step(1/60f, 6, 2);
+
+        gameCame.position.x = player.b2body.getPosition().x;
+
+        //update our gameCame with correct coordinates after changes
         gameCame.update();
+        //tell our renderer to draw only what our camera can see in our game world
         renderer.setView(gameCame);
     }
 
     @Override
     public void render(float delta) {
+        //separate our update logic from render
         update(delta);
         //color background
         Gdx.gl.glClearColor(0,0,0,1);
